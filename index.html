@@ -679,11 +679,11 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <!-- Google Map Column -->
                 <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                     <iframe class="position-relative rounded w-100 h-100"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3591.8442825721922!2d28.706023675544518!3d-25.808710847983996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1eeab28ffbf2b7bf%3A0x23be4e8cc74c71c4!2s24%20Madeliefie%20St%2C%20Riamarpark%2C%20Bronkhorstspruit%2C%201020!5e0!3m2!1sen!2sza!4v1742452920600!5m2!1sen!2sza"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3591.8442825721922!2d28.706023675544518!3d-25.808710847983996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1eeab28ffbf2b7bf%3A0x23be4e8cc74c71c4!2s24%20Madeliefie%20St%2C%20Riamarpark%2C%20Bronkhorstspruit%2C%201020!5e0!3m2!1sen!2sza!4v1742452920600!5m2!1sen!2sza"
                         frameborder="0" style="min-height: 300px; border:0;" allowfullscreen="" aria-hidden="false"
                         tabindex="0"></iframe>
                 </div>
@@ -864,31 +864,37 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.getElementById('contactForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+        document.getElementById("contactForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
 
-            const formData = new FormData(document.getElementById('contactForm'));
-            const jsonData = Object.fromEntries(formData.entries()); // Convert to JSON
+            const formData = {
+                name: document.getElementById("name").value,
+                number: document.getElementById("number").value,
+                email: document.getElementById("email").value,
+                subject: document.getElementById("subject").value,
+                message: document.getElementById("message").value
+            };
 
-            fetch('/.netlify/functions/sendEmail', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(jsonData),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        Swal.fire({ icon: 'success', title: 'Success!', text: data.message });
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Error!', text: data.message });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({ icon: 'error', title: 'Error!', text: 'An error occurred while sending the message.' });
+            try {
+                let response = await fetch("/.netlify/functions/contact-form", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
                 });
+
+                let result = await response.json();
+
+                if (result.status === "success") {
+                    alert("Message sent successfully!");
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                alert("Failed to send message.");
+            }
         });
     </script>
+
 
     <script>
         document.getElementById('appointmentForm').addEventListener('submit', function (e) {
